@@ -3,8 +3,11 @@ import LoginTop from "./LoginTop";
 import {Link, useNavigate} from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import BeatLoader from "react-spinners/BeatLoader";
 
 export default function SignUp(){
+    const [disabled, setDisabled] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -20,14 +23,18 @@ export default function SignUp(){
             password
         }
 
+        setLoading(true)
+        setDisabled(true)
+
         const promise = axios.post('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up', body)
 
         promise.then(resp => {
-            console.log(resp.data)
             navigate("/", { replace: true });
         })
 
         .catch(err => {
+            setLoading(false)
+            setDisabled(false)
             alert("Erro ao realizar o cadastro. Tente novamente!");
         })
     }
@@ -35,12 +42,12 @@ export default function SignUp(){
     return(
         <ContainerRegister>
             <LoginTop />
-            <Form onSubmit={signup}>
-                <input type="email" value={email} placeholder="Email" required onChange={e => setEmail(e.target.value)}></input>
-                <input type="password" value={password} placeholder="Senha" required onChange={e => setPassword(e.target.value)}></input>
-                <input type="name" value={name} placeholder="Nome" required onChange={e => setName(e.target.value)}></input>
-                <input type="photo" value={photo} placeholder="Foto" required onChange={e => setPhoto(e.target.value)}></input>
-                <button>Cadastrar</button>
+            <Form input_color={disabled? '#D4D4D4' : '#FFF'} opacity={disabled? '0.7' : null} onSubmit={signup}>
+                <input type="email" value={email} placeholder="Email" required onChange={e => setEmail(e.target.value)} disabled={disabled}></input>
+                <input type="password" value={password} placeholder="Senha" required onChange={e => setPassword(e.target.value)} disabled={disabled}></input>
+                <input type="name" value={name} placeholder="Nome" required onChange={e => setName(e.target.value)} disabled={disabled}></input>
+                <input type="photo" value={photo} placeholder="Foto" required onChange={e => setPhoto(e.target.value)} disabled={disabled}></input>
+                <button disabled={disabled}>{loading ? <BeatLoader color="white" size={15} /> : "Cadastrar"}</button>
             </Form>
             <Link to={"/"}>
                 <Login>Já tem uma conta? Faça login!</Login>
@@ -65,7 +72,7 @@ const Form = styled.form`
     input{
         width: 303px;
         height: 45px;
-        background: #FFFFFF;
+        background: ${props => props.input_color};
         border: 1px solid #D5D5D5;
         border-radius: 5px;
         margin-top: 6px;
@@ -91,7 +98,7 @@ const Form = styled.form`
             border-radius: 4.63636px;
             border: none;
             margin-top: 6px;
-
+            opacity: ${props => props.opacity};
             font-family: 'Lexend Deca';
             font-style: normal;
             font-weight: 400;

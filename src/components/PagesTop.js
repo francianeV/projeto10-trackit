@@ -1,10 +1,13 @@
+import { useContext } from "react";
 import styled from "styled-components";
+import MyContext from "./Context/MyContext";
 
 export default function PagesTop(){
+    const {img} = useContext(MyContext)
     return(
         <Top>
             <span>Trackit</span>
-            <img src="https://s1.static.brasilescola.uol.com.br/be/conteudo/images/imagem-em-lente-convexa.jpg" alt="foto perfil" />
+            <img src={img} alt="foto perfil" />
         </Top>
         );
 }
