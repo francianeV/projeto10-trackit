@@ -14,6 +14,6 @@ export default function TodayHabits(){
 const Container = styled.div`
     width: 100%;
     height: 1000px;
-    background-color: #fff;
+    background-color: #E5E5E5;
 `;
 
