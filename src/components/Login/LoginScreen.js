@@ -55,7 +55,7 @@ export default function LoginScreen({setToken}){
             <Form input_color={disabled? '#D4D4D4' : '#FFF'} opacity={disabled? '0.7' : null} onSubmit={sendInfos}> 
                 <input type="email"  value={email} placeholder="Email" required onChange={e => setEmail(e.target.value)} disabled={disabled} ></input>
                 <input type="password"  value={password} placeholder="Senha" required onChange={e => setPassword(e.target.value)}disabled={disabled}></input>
-                {loading ? <button disabled={disabled}><BeatLoader color="white" size={15} /></button> :  <button>Entrar</button> }
+                <button disabled={disabled}> {loading ? <BeatLoader color="white" size={15} /> : "Entrar" }</button> 
                
             </Form>
             <Link to={"/cadastro"}>
