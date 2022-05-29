@@ -71,12 +71,8 @@ export default function HabitsPage({token}){
 
     promise.then(res => {
         setHabits(res.data);
-        console.log(res.data)
     })
 
-    .catch(err => {
-        console.log(err)
-    })
     },[]);
     
 
@@ -91,7 +87,6 @@ export default function HabitsPage({token}){
 
         promise.then(res => {
             setHabits([...habits, res.data])
-            console.log(res.data)
             setLoading(false)
             setHabitName('')
             setCreateHabit(false)
@@ -122,7 +117,7 @@ export default function HabitsPage({token}){
             promise.then(() => {const newHabits = habits.filter((all) => all.id !== habit);
                 setHabits(newHabits)
             })
-            .catch(err => console.log(err))
+            .catch("Não foi possivel deletar.")
         }
 
     }
