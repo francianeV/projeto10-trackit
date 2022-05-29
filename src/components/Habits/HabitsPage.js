@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import FooterButtons from "../FooterButtons";
 import PagesTop from "../PagesTop";
+import BeatLoader from "react-spinners/BeatLoader";
 
 function Days({day, id, selectedDays, setSelectedDays}){
     
@@ -12,7 +13,6 @@ function Days({day, id, selectedDays, setSelectedDays}){
         if(!chosen){
             setChosen(!chosen)
             setSelectedDays([...selectedDays, id])
-            console.log(chosen)
             console.log(selectedDays)
         }
         else if(chosen){
@@ -29,14 +29,34 @@ function Days({day, id, selectedDays, setSelectedDays}){
     );
 }
 
+function Habits({name, daysOfWeek, habits, days, deleteHabit, habit}){
+
+    //days.some(day => day === daysOfWeek.id);
+
+
+    return(
+
+        <Habit>
+            <h3>{name}</h3>
+            <DaysContainer>
+                {daysOfWeek.map((day, index) => <Day key={day.id}>{day.day}</Day>)}
+            </DaysContainer>
+            <ion-icon name="trash-outline" onClick={() => deleteHabit(habit, habits)}></ion-icon>
+        </Habit>
+    
+    );
+}
+
 export default function HabitsPage({token}){
+    const [disable, setDisable] = useState(false);
     const [habits, setHabits] = useState([]);
+    const [days, setDays] = useState([]);
     const [habitName, setHabitName] = useState('');
     const [createHabtit, setCreateHabit] = useState(false)
     const [selectedDays, setSelectedDays] = useState([])
-    const daysOfWeek = [{day: "D", id: 7}, {day: "S", id: 1}, {day: "T", id: 2}, {day: "Q", id: 3}, {day: "Q", id: 4}, {day: "S", id:5}, {day: "S", id: 6}]
+    const [loading, setLoading] = useState(false)
+    const daysOfWeek = [{day: "D", id: 7, status: false }, {day: "S", id: 1, status: false}, {day: "T", id: 2, status: false}, {day: "Q", id: 3, status: false}, {day: "Q", id: 4, status: false}, {day: "S", id:5, status: false}, {day: "S", id: 6, status: false}]
 
-    console.log(habitName);
 
     const config = {
         headers: {
@@ -50,6 +70,7 @@ export default function HabitsPage({token}){
 
     promise.then(res => {
         setHabits(res.data);
+        setDays(res.data.days);
         console.log(res.data)
     })
 
@@ -57,11 +78,64 @@ export default function HabitsPage({token}){
         console.log(err)
     })
     },[]);
+    
+
+    function addHabits(){
+        const body = {
+            name: habitName,
+            days: selectedDays
+        };
+
+
+        const promise = axios.post('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits',body, config)
+
+        promise.then(res => {
+            setHabits([...habits, res.data])
+            console.log(res.data)
+            setLoading(false)
+            setHabitName('')
+            setCreateHabit(false)
+        })
+
+        .catch(err => {
+            if(err.request.status === 422){
+                alert('Preencha todos os campos')
+                setLoading(false)
+                
+            }else{
+                alert('Algo deu errado! Tente novamente.')
+                setLoading(false)
+            }})
+
+    }
+
+    function deleteHabit(habit){
+        const confirm = window.confirm("Voce tem certeza que deseja excluir este item?")
+
+        if(confirm) {
+            const promise = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${habit}`, {
+                data: { habit }, headers: {
+                    "Authorization": "Bearer " + token
+                }
+            })
+
+            promise.then(() => {const newHabits = habits.filter((all) => all.id !== habit);
+                setHabits(newHabits)
+                console.log('funfou')
+            })
+            .catch(err => console.log(err))
+        }
+
+    }
+
+    function isLoading(){
+        setLoading(true);
+    }
 
 
     function listHabits(){
         if(habits.length > 0){
-            return console.log("testando condiçao")
+            return habits.map((habit,index) => <Habits days={days} key={index} habit={habit.id} deleteHabit={deleteHabit} name={habit.name} id={habit.id} daysOfWeek={daysOfWeek} habits={habits}/>)
         }else{
             return <InitialText>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</InitialText>
          }
@@ -77,13 +151,13 @@ export default function HabitsPage({token}){
             </Header>
             {createHabtit ?
                 <AddHabit>
-                    <input type="text" value={habitName} placeholder="nome do hábito" required onChange={e => setHabitName(e.target.value)}></input>
+                    <input type="text" value={habitName} placeholder="nome do hábito" required onChange={e => setHabitName(e.target.value)} disabled={disable}></input>
                     <DaysContainer>
-                        {daysOfWeek.map(day => <Days key={day.id} id={day.id} day={day.day} selectedDays={selectedDays} setSelectedDays={setSelectedDays}/>)}
+                        {daysOfWeek.map(day => <Days key={day.id} id={day.id} day={day.day} selectedDays={selectedDays} setSelectedDays={setSelectedDays} />)}
                     </DaysContainer>
                     <Actions>
-                        <Cancel onClick={() => setCreateHabit(false)}>Cancelar</Cancel>
-                        <Save>Salvar</Save>
+                        <Cancel onClick={() => setCreateHabit(false)} disable={disable}>Cancelar</Cancel>
+                        <Save onClick={() => { addHabits(); isLoading();}} disabled={disable} >{loading ? <BeatLoader color="white" size={15} /> : 'Salvar'}</Save>
                     </Actions>
                 </AddHabit>
 
@@ -100,6 +174,7 @@ const Container = styled.div`
     width: 100%;
     height: 800px;
     background-color: #E5E5E5;
+    overflow-x: auto;
 `;
 
 const Header = styled.div`
@@ -165,7 +240,7 @@ const InitialText = styled.p`
 `;
 
 const AddHabit = styled.div`
-    width: 380px;
+    width: 92%;
     height: 180px;
     background: #FFFFFF;
     border-radius: 5px;
@@ -253,5 +328,35 @@ const Day = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+ `;
+
+ const Habit = styled.div`
+    width: 92%;
+    height: 91px;
+    background: #FFFFFF;
+    border-radius: 5px;
+    margin-left: 15px;
+    margin-bottom: 15px;
+    position: relative;
+
+    h3{
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 19.976px;
+    line-height: 25px;
+    color: #666666;
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    }
+
+    ion-icon{
+        position: absolute;
+        left: 92.07%;
+        right: 8.47%;
+        top: 16.69%;
+        bottom: 74.06%;
+    }
  `;
 
