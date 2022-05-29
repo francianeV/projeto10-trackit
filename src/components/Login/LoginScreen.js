@@ -27,7 +27,6 @@ export default function LoginScreen({setToken}){
         const promise = axios.post('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login', body)
 
         promise.then(res => {
-            console.log(res.data);
             setToken(res.data.token)
             setImg(res.data.image)
             navigate("/hoje", { replace: true });

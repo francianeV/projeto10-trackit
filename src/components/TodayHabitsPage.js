@@ -3,10 +3,11 @@ import styled from "styled-components";
 import FooterButtons from "./FooterButtons";
 
 export default function TodayHabits(){
+    
     return(
         <Container>
             <PagesTop />
-            Entrei nos habitos do dia
+            <Hora>Domingo, 29/05</Hora>
             <FooterButtons />
         </Container>)
 }
@@ -17,3 +18,9 @@ const Container = styled.div`
     background-color: #E5E5E5;
 `;
 
+const Hora = styled.div`
+    margin-top: 80px;
+    width: 200px;
+    height: 50px;
+    background-color: lightblue;
+`;

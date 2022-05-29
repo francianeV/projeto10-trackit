@@ -13,7 +13,6 @@ function Days({day, id, selectedDays, setSelectedDays}){
         if(!chosen){
             setChosen(!chosen)
             setSelectedDays([...selectedDays, id])
-            console.log(selectedDays)
         }
         else if(chosen){
             setSelectedDays(selectedDays.filter((e) => e !== id ))
@@ -29,17 +28,14 @@ function Days({day, id, selectedDays, setSelectedDays}){
     );
 }
 
-function Habits({name, daysOfWeek, habits, days, deleteHabit, habit}){
-
-    //days.some(day => day === daysOfWeek.id);
-
+function Habits({name, daysOfWeek, habits, deleteHabit, habit}){
 
     return(
 
         <Habit>
             <h3>{name}</h3>
             <DaysContainer>
-                {daysOfWeek.map((day, index) => <Day key={day.id}>{day.day}</Day>)}
+                {daysOfWeek.map((day) => <Day key={day.id}>{day.day}</Day>)}
             </DaysContainer>
             <ion-icon name="trash-outline" onClick={() => deleteHabit(habit, habits)}></ion-icon>
         </Habit>
@@ -50,12 +46,17 @@ function Habits({name, daysOfWeek, habits, days, deleteHabit, habit}){
 export default function HabitsPage({token}){
     const [disable, setDisable] = useState(false);
     const [habits, setHabits] = useState([]);
-    const [days, setDays] = useState([]);
     const [habitName, setHabitName] = useState('');
     const [createHabtit, setCreateHabit] = useState(false)
     const [selectedDays, setSelectedDays] = useState([])
     const [loading, setLoading] = useState(false)
-    const daysOfWeek = [{day: "D", id: 7, status: false }, {day: "S", id: 1, status: false}, {day: "T", id: 2, status: false}, {day: "Q", id: 3, status: false}, {day: "Q", id: 4, status: false}, {day: "S", id:5, status: false}, {day: "S", id: 6, status: false}]
+    const daysOfWeek = [{day: "D", id: 7}, 
+                        {day: "S", id: 1}, 
+                        {day: "T", id: 2}, 
+                        {day: "Q", id: 3}, 
+                        {day: "Q", id: 4}, 
+                        {day: "S", id:5}, 
+                        {day: "S", id: 6}]
 
 
     const config = {
@@ -70,7 +71,6 @@ export default function HabitsPage({token}){
 
     promise.then(res => {
         setHabits(res.data);
-        setDays(res.data.days);
         console.log(res.data)
     })
 
@@ -121,7 +121,6 @@ export default function HabitsPage({token}){
 
             promise.then(() => {const newHabits = habits.filter((all) => all.id !== habit);
                 setHabits(newHabits)
-                console.log('funfou')
             })
             .catch(err => console.log(err))
         }
@@ -135,7 +134,14 @@ export default function HabitsPage({token}){
 
     function listHabits(){
         if(habits.length > 0){
-            return habits.map((habit,index) => <Habits days={days} key={index} habit={habit.id} deleteHabit={deleteHabit} name={habit.name} id={habit.id} daysOfWeek={daysOfWeek} habits={habits}/>)
+            return habits.map((habit,index) => <Habits  
+                                                    key={index} 
+                                                    habit={habit.id} 
+                                                    deleteHabit={deleteHabit} 
+                                                    name={habit.name} 
+                                                    id={habit.id} 
+                                                    daysOfWeek={daysOfWeek} 
+                                                    habits={habits}/>)
         }else{
             return <InitialText>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</InitialText>
          }
