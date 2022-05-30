@@ -9,9 +9,7 @@ export default function TodayHabits({token}){
     const {today, setToday, counter, setCounter} = useContext(MyContext)
     const dayjs = require('dayjs');
     const [loadApi, setLoadApi] = useState(true);
-    let habitsDone = (counter * 100) / today.length;
-
-    console.log(token);
+    let habitsDone = ((counter * 100) / today.length).toFixed(0);
 
     const config = {
         headers: {
@@ -46,27 +44,29 @@ export default function TodayHabits({token}){
     }
 
     return(
-        <Container>
-            <PagesTop />
-            <Date>{dayjs().locale('pt-br').format("dddd, DD/MM")}</Date>
-            <Subtitle>{habitsDone > 0 ? `${habitsDone} % dos hábitos concluídos` : 'Nenhum hábito concluído ainda'}</Subtitle>
-            {today.map((value, index) => 
-                <Habits key={index}>
-                    <h3>{value.name}</h3>
-                    <HabitsInfo>
-                        <div>
-                            <SequenceInfo>
-                                <p>Sequência atual:</p><SequenceDays color={value.done}> {value.currentSequence} {value.currentSequence > 1 || value.currentSequence === 0 ? "dias" : "dia"}</SequenceDays>
-                            </SequenceInfo>
-                            <SequenceInfo>
-                                <p>Seu recorde:</p><Record color={(value.currentSequence === value.highestSequence && value.highestSequence !== 0)}>{value.highestSequence} {value.highestSequence > 1 || value.currentSequence === 0 ? "dias" : "dia"}</Record>
-                            </SequenceInfo>
-                        </div>
-                        <Check background={value.done} onClick={() => statusHabit(value.id, value.done)}><ion-icon name="checkmark-outline"></ion-icon></Check>
-                    </HabitsInfo>
-                </Habits>)}
+        <>
+            <Container>
+                <PagesTop />
+                <Date>{dayjs().locale('pt-br').format("dddd, DD/MM")}</Date>
+                <Subtitle>{habitsDone > 0 ? `${habitsDone} % dos hábitos concluídos` : 'Nenhum hábito concluído ainda'}</Subtitle>
+                {today.map((value, index) => 
+                    <Habits key={index}>
+                        <h3>{value.name}</h3>
+                        <HabitsInfo>
+                            <div>
+                                <SequenceInfo>
+                                    <p>Sequência atual:</p><SequenceDays color={value.done}> {value.currentSequence} {value.currentSequence > 1 || value.currentSequence === 0 ? "dias" : "dia"}</SequenceDays>
+                                </SequenceInfo>
+                                <SequenceInfo>
+                                    <p>Seu recorde:</p><Record color={(value.currentSequence === value.highestSequence && value.highestSequence !== 0)}>{value.highestSequence} {value.highestSequence > 1 || value.currentSequence === 0 ? "dias" : "dia"}</Record>
+                                </SequenceInfo>
+                            </div>
+                            <Check background={value.done} onClick={() => statusHabit(value.id, value.done)}><ion-icon name="checkmark-outline"></ion-icon></Check>
+                        </HabitsInfo>
+                    </Habits>)}
+            </Container>
             <FooterButtons />
-        </Container>
+        </>
         );
 }
 
@@ -78,8 +78,8 @@ const HabitsInfo = styled.div`
 
 const Container = styled.div`
     width: 100%;
-    height: 1000px;
-    background-color: #E5E5E5;
+    height: auto;
+    margin-bottom: 90px;
 `;
 
 const Date = styled.div`

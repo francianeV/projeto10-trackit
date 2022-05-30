@@ -5,7 +5,7 @@ import FooterButtons from "../FooterButtons";
 import PagesTop from "../PagesTop";
 import BeatLoader from "react-spinners/BeatLoader";
 
-function Days({day, id, selectedDays, setSelectedDays}){
+function Days({day, id, selectedDays, setSelectedDays, disable}){
     
     const [chosen, setChosen] = useState();
     
@@ -23,7 +23,7 @@ function Days({day, id, selectedDays, setSelectedDays}){
 
     return(
         
-        <Day color={chosen ? '#CFCFCF' : '#FFF'}font_color={chosen ? '#FFF' : '#DBDBDB'} onClick={chosenDays}>{day}</Day>
+        <Day color={chosen ? '#CFCFCF' : '#FFF'}font_color={chosen ? '#FFF' : '#DBDBDB'} onClick={chosenDays} disable={disable}>{day}</Day>
             
     );
 }
@@ -77,6 +77,7 @@ export default function HabitsPage({token}){
     
 
     function addHabits(){
+        setDisable(true)
         if(selectedDays.length > 0){
             
         const body = {
@@ -92,20 +93,24 @@ export default function HabitsPage({token}){
             setLoading(false)
             setHabitName('')
             setCreateHabit(false)
+            setDisable(false)
         })
 
         .catch(err => {
             if(err.request.status === 422){
                 alert('Preencha todos os campos')
                 setLoading(false)
+                setDisable(false)
                 
             }else{
-                alert('Algo deu errado! Tente novamente.')
+                alert(err)
                 setLoading(false)
+                setDisable(false)
             }})
         } 
             else {
                 setLoading(false)
+                setDisable(false)
                 alert('Escolha pelo menos um dia da semana')
         }
 
@@ -151,37 +156,40 @@ export default function HabitsPage({token}){
 
     const showingHabits = listHabits();
     return(
-        <Container>
-            <PagesTop />
-            <Header>
-                <h2>Meus hábitos</h2>
-                <button onClick={() => setCreateHabit(true)}><span>+</span></button>
-            </Header>
-            {createHabtit ?
-                <AddHabit>
-                    <input type="text" value={habitName} placeholder="nome do hábito" required onChange={e => setHabitName(e.target.value)} disabled={disable}></input>
-                    <DaysContainer>
-                        {daysOfWeek.map(day => <Days key={day.id} id={day.id} day={day.day} selectedDays={selectedDays} setSelectedDays={setSelectedDays} />)}
-                    </DaysContainer>
-                    <Actions>
-                        <Cancel onClick={() => setCreateHabit(false)} disable={disable}>Cancelar</Cancel>
-                        <Save onClick={() => { addHabits(); isLoading();} } disabled={disable} >{loading ? <BeatLoader color="white" size={15} /> : 'Salvar'}</Save>
-                    </Actions>
-                </AddHabit>
+        <>
+            <Container>
+                <PagesTop />
+                <Header>
+                    <h2>Meus hábitos</h2>
+                    <button onClick={() => setCreateHabit(true)}><span>+</span></button>
+                </Header>
+                {createHabtit ?
+                    <AddHabit input_color={disable? '#F2F2F2' : '#FFF'}>
+                        <input type="text" value={habitName} placeholder="nome do hábito" required onChange={e => setHabitName(e.target.value)} disabled={disable}></input>
+                        <DaysContainer>
+                            {daysOfWeek.map(day => <Days key={day.id} id={day.id} day={day.day} selectedDays={selectedDays} setSelectedDays={setSelectedDays} disable={disable}/>)}
+                        </DaysContainer>
+                        <Actions>
+                            <Cancel onClick={() => setCreateHabit(false)} disable={disable}>Cancelar</Cancel>
+                            <Save onClick={() => { addHabits(); isLoading();} } disabled={disable}>{loading ? <BeatLoader color="white" size={15} /> : 'Salvar'}</Save>
+                        </Actions>
+                    </AddHabit>
 
-                 : null}
-            
-            {showingHabits}
+                    : null}
+                
+                {showingHabits}
+            </Container>
             <FooterButtons />
-        </Container>);
+        </>
+        );
 
         
 }
 
 const Container = styled.div`
     width: 100%;
-    height: 800px;
-    background-color: #E5E5E5;
+    height: auto;
+    margin-bottom: 70px;
     overflow-x: auto;
 `;
 
@@ -257,7 +265,7 @@ const AddHabit = styled.div`
     input{
         width: 303px;
         height: 45px;
-        background: #FFFFFF;
+        background: ${props => props.input_color};
         border: 1px solid #D5D5D5;
         border-radius: 5px;
         padding-left: 10px;
@@ -288,6 +296,7 @@ const Day = styled.div`
     font-weight: 400;
     font-size: 19.976px;
     line-height: 25px;
+    pointer-events: ${props => props.disable ? 'none': 'auto'};
     color: ${props => props.font_color};
 `;
  const DaysContainer = styled.div`
@@ -310,6 +319,8 @@ const Day = styled.div`
     margin-bottom: 40px;
     margin-top: 30px;
     margin-left: 160px;
+    opacity: ${props => props.disable ? 0.7 : ''};
+    pointer-events: ${props => props.disable ? 'none': 'auto'};
  `;
 
  const Save = styled.button`
@@ -320,6 +331,7 @@ const Day = styled.div`
     border: none;
     margin-left: 30px;
     margin-bottom: 10px;
+    opacity: ${props => props.disabled ? 0.7 : ''};
 
     font-family: 'Lexend Deca';
     font-style: normal;
@@ -366,5 +378,7 @@ const Day = styled.div`
         top: 16.69%;
         bottom: 74.06%;
     }
+
+
  `;
 

@@ -12,10 +12,23 @@ export default function App(){
     const [img, setImg] = useState();
     const [today, setToday] = useState([]);
     const [counter, setCounter] = useState(0);
+    const [loginToken, setLoginToken] = useState({});
+    const [control, setControl] = useState(true);
+
+    if(control){
+        setControl(false);
+        const login = localStorage.getItem("login");
+        const loginSerialized = JSON.parse(login);
+        setLoginToken({...loginSerialized})
+    }
+    
+
+
+    
 
 
     return (
-        <MyContext.Provider value={{img, setImg, today, setToday, counter, setCounter}}>
+        <MyContext.Provider value={{img, setImg, today, setToday, counter, setCounter, loginToken}}>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<LoginScreen setToken={setToken}/>}/>
