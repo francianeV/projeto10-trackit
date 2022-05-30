@@ -4,10 +4,24 @@ import FooterButtons from "./FooterButtons";
 import axios from "axios";
 import { useState, useContext,useEffect } from "react";
 import MyContext from "./Context/MyContext";
+import dayjs from "dayjs"
+import "dayjs/locale/pt-br"
 
 export default function TodayHabits({token}){
     const {today, setToday, counter, setCounter} = useContext(MyContext)
-    const dayjs = require('dayjs');
+
+    dayjs.extend(require("dayjs/plugin/updateLocale"));
+    dayjs.updateLocale("pt-br", {
+        weekdays: [
+            "Domingo",
+            "Segunda",
+            "Terça",
+            "Quarta",
+            "Quinta",
+            "Sexta",
+            "Sabado",
+            ],
+        });
     const [loadApi, setLoadApi] = useState(true);
     let habitsDone = ((counter * 100) / today.length).toFixed(0);
 
@@ -47,7 +61,7 @@ export default function TodayHabits({token}){
         <>
             <Container>
                 <PagesTop />
-                <Date>{dayjs().locale('pt-br').format("dddd, DD/MM")}</Date>
+                <Date>{`${dayjs().locale('pt-br').format("dddd, DD/MM")}`}</Date>
                 <Subtitle>{habitsDone > 0 ? `${habitsDone} % dos hábitos concluídos` : 'Nenhum hábito concluído ainda'}</Subtitle>
                 {today.map((value, index) => 
                     <Habits key={index}>
