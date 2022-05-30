@@ -4,8 +4,9 @@ import styled from "styled-components";
 import FooterButtons from "../FooterButtons";
 import PagesTop from "../PagesTop";
 import BeatLoader from "react-spinners/BeatLoader";
+import daysOfWeek from "./daysOfWeek";
 
-function Days({day, id, selectedDays, setSelectedDays, disable}){
+function Days({day, id, selectedDays, setSelectedDays, disable, daysWeek, setDaysWeek, daysOfWeek, status, days}){
     
     const [chosen, setChosen] = useState();
     
@@ -21,6 +22,7 @@ function Days({day, id, selectedDays, setSelectedDays, disable}){
        
     }
 
+
     return(
         
         <Day color={chosen ? '#CFCFCF' : '#FFF'}font_color={chosen ? '#FFF' : '#DBDBDB'} onClick={chosenDays} disable={disable}>{day}</Day>
@@ -28,16 +30,24 @@ function Days({day, id, selectedDays, setSelectedDays, disable}){
     );
 }
 
-function Habits({name, daysOfWeek, habits, deleteHabit, habit}){
+function Habits({name, deleteHabit, habit, id}){
 
     return(
 
         <Habit>
             <h3>{name}</h3>
             <DaysContainer>
-                {daysOfWeek.map((day) => <Day key={day.id}>{day.day}</Day>)}
+                {daysOfWeek.map((day, index) => (
+                    <Day
+                        key={index}
+                        color={habit.days?.indexOf(day.id) !== -1 ? "#DBDBDB" : "#FFFFFF"} 
+                        font_color={habit.days?.indexOf(day.id) !== -1 ? "#FFFFFF" : "#CFCFCF"}
+                    >
+                        {day.day}
+                    </Day>
+                ))}
             </DaysContainer>
-            <ion-icon name="trash-outline" onClick={() => deleteHabit(habit, habits)}></ion-icon>
+            <ion-icon name="trash-outline" onClick={() => deleteHabit(id)}></ion-icon>
         </Habit>
     
     );
@@ -50,14 +60,6 @@ export default function HabitsPage({token}){
     const [createHabtit, setCreateHabit] = useState(false)
     const [selectedDays, setSelectedDays] = useState([])
     const [loading, setLoading] = useState(false)
-    const daysOfWeek = [{day: "D", id: 0}, 
-                        {day: "S", id: 1}, 
-                        {day: "T", id: 2}, 
-                        {day: "Q", id: 3}, 
-                        {day: "Q", id: 4}, 
-                        {day: "S", id: 5}, 
-                        {day: "S", id: 6}]
-
 
     const config = {
         headers: {
@@ -116,17 +118,17 @@ export default function HabitsPage({token}){
 
     }
 
-    function deleteHabit(habit){
+    function deleteHabit(id){
         const confirm = window.confirm("Voce tem certeza que deseja excluir este item?")
 
         if(confirm) {
-            const promise = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${habit}`, {
-                data: { habit }, headers: {
+            const promise = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`, {
+                data: { id }, headers: {
                     "Authorization": "Bearer " + token
                 }
             })
 
-            promise.then(() => {const newHabits = habits.filter((all) => all.id !== habit);
+            promise.then(() => {const newHabits = habits.filter((all) => all.id !== id);
                 setHabits(newHabits)
             })
             .catch("Não foi possivel deletar.")
@@ -143,12 +145,13 @@ export default function HabitsPage({token}){
         if(habits.length > 0){
             return habits.map((habit,index) => <Habits  
                                                     key={index} 
-                                                    habit={habit.id} 
+                                                    habit={habit} 
                                                     deleteHabit={deleteHabit} 
                                                     name={habit.name} 
                                                     id={habit.id} 
                                                     daysOfWeek={daysOfWeek} 
-                                                    habits={habits}/>)
+                                                    days={selectedDays}
+                                                    />)
         }else{
             return <InitialText>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</InitialText>
          }
@@ -167,7 +170,16 @@ export default function HabitsPage({token}){
                     <AddHabit input_color={disable? '#F2F2F2' : '#FFF'}>
                         <input type="text" value={habitName} placeholder="nome do hábito" required onChange={e => setHabitName(e.target.value)} disabled={disable}></input>
                         <DaysContainer>
-                            {daysOfWeek.map(day => <Days key={day.id} id={day.id} day={day.day} selectedDays={selectedDays} setSelectedDays={setSelectedDays} disable={disable}/>)}
+                            {daysOfWeek.map(day => <Days 
+                                                        key={day.id} 
+                                                        id={day.id} 
+                                                        daysOfWeek={daysOfWeek}  
+                                                        status={day.status} 
+                                                        day={day.day} 
+                                                        selectedDays={selectedDays} 
+                                                        setSelectedDays={setSelectedDays} 
+                                                        disable={disable}
+                                                        days={selectedDays}/>)}
                         </DaysContainer>
                         <Actions>
                             <Cancel onClick={() => setCreateHabit(false)} disable={disable}>Cancelar</Cancel>

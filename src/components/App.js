@@ -1,5 +1,6 @@
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import { useState } from "react";
+import GlobalStyle from "../globalStyles";
 import LoginScreen from "./Login/LoginScreen";
 import SignUpPage from "./Login/SignUpPage";
 import TodayHabitsPage from "./TodayHabitsPage";
@@ -23,12 +24,9 @@ export default function App(){
     }
     
 
-
-    
-
-
     return (
         <MyContext.Provider value={{img, setImg, today, setToday, counter, setCounter, loginToken}}>
+            <GlobalStyle />
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<LoginScreen setToken={setToken}/>}/>
