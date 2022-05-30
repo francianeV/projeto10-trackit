@@ -96,6 +96,7 @@ export default function HabitsPage({token}){
             setHabitName('')
             setCreateHabit(false)
             setDisable(false)
+            setSelectedDays([])
         })
 
         .catch(err => {
@@ -156,6 +157,7 @@ export default function HabitsPage({token}){
             return <InitialText>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</InitialText>
          }
     }
+
 
     const showingHabits = listHabits();
     return(
