@@ -50,12 +50,12 @@ export default function HabitsPage({token}){
     const [createHabtit, setCreateHabit] = useState(false)
     const [selectedDays, setSelectedDays] = useState([])
     const [loading, setLoading] = useState(false)
-    const daysOfWeek = [{day: "D", id: 7}, 
+    const daysOfWeek = [{day: "D", id: 0}, 
                         {day: "S", id: 1}, 
                         {day: "T", id: 2}, 
                         {day: "Q", id: 3}, 
                         {day: "Q", id: 4}, 
-                        {day: "S", id:5}, 
+                        {day: "S", id: 5}, 
                         {day: "S", id: 6}]
 
 
@@ -77,6 +77,8 @@ export default function HabitsPage({token}){
     
 
     function addHabits(){
+        if(selectedDays.length > 0){
+            
         const body = {
             name: habitName,
             days: selectedDays
@@ -101,6 +103,11 @@ export default function HabitsPage({token}){
                 alert('Algo deu errado! Tente novamente.')
                 setLoading(false)
             }})
+        } 
+            else {
+                setLoading(false)
+                alert('Escolha pelo menos um dia da semana')
+        }
 
     }
 
@@ -158,7 +165,7 @@ export default function HabitsPage({token}){
                     </DaysContainer>
                     <Actions>
                         <Cancel onClick={() => setCreateHabit(false)} disable={disable}>Cancelar</Cancel>
-                        <Save onClick={() => { addHabits(); isLoading();}} disabled={disable} >{loading ? <BeatLoader color="white" size={15} /> : 'Salvar'}</Save>
+                        <Save onClick={() => { addHabits(); isLoading();} } disabled={disable} >{loading ? <BeatLoader color="white" size={15} /> : 'Salvar'}</Save>
                     </Actions>
                 </AddHabit>
 
