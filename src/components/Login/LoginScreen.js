@@ -7,12 +7,27 @@ import BeatLoader from "react-spinners/BeatLoader";
 import MyContext from "../Context/MyContext";
 
 export default function LoginScreen({setToken}){
-    const {setImg} = useContext(MyContext)
+    const {setImg, loginToken} = useContext(MyContext)
     const [loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [control, setControl] = useState(true);
+
+    if(loginToken.email && control){
+        setControl(false)
+        const promise = axios.post('https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login',loginToken);
+
+        promise.then(res => {
+            setToken(res.data.token)
+            setImg(res.data.image)
+            navigate("/hoje", { replace:true});
+        })
+        .catch(err=> {
+            alert(err);
+        })
+    }
 
     function sendInfos(event){
         event.preventDefault();
@@ -29,6 +44,8 @@ export default function LoginScreen({setToken}){
         promise.then(res => {
             setToken(res.data.token)
             setImg(res.data.image)
+            const loginSerialized = JSON.stringify({...body});
+            localStorage.setItem("login", loginSerialized);
             navigate("/hoje", { replace: true });
         })
 
@@ -44,7 +61,7 @@ export default function LoginScreen({setToken}){
                 setDisabled(false)
                 
             }else{
-                console.log(err.request.status);
+               alert(err.request.status);
             }})
     }
 
